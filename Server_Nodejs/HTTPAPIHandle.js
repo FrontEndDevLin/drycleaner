@@ -12,6 +12,7 @@ function HTTPAPIHandle() {
     let Store = require("./APIStore");
     let Staff = require("./APIStaff");
     let Orderform = require("./APIOrderform");
+    let Inform = require("./APIInform");
 
     let ConfParser = require("./ConfigParser");
     let NS = require("./NameSpace");
@@ -63,6 +64,9 @@ function HTTPAPIHandle() {
             } break;
             case "orderform": {
                 Orderform.OnOrderform(req, res, handle);
+            } break;
+            case "inform": {
+                Inform.OnInform(req, res, handle);
             } break;
             default:
                 break;

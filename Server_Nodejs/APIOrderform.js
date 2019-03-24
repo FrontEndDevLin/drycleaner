@@ -130,7 +130,10 @@ function Orderform() {
                     if (err) throw err;
                     if (result && result.length >= 0) {
                         rspData["items"] = result;
-                        NS.Send(res, NS.Build(200, "查询成功", rspData));
+                        progress += 50;
+                        if (progress == 100) {
+                            NS.Send(res, NS.Build(200, "查询成功", rspData));
+                        }
                     } else {
                         NS.Send(res, NS.Build(406, "参数错误"));
                     }
@@ -165,7 +168,7 @@ function Orderform() {
                         progress += 50;
                         if (progress == 100) {
                             NS.Send(res, NS.Build(200, "处理成功"));
-                            MySQL.Query(`UPDATE vip SET count=count+20 WHERE name=(SELECT user FROM orderform WHERE _id=?) AND phone=(SELECT phone FROM orderform WHERE _id=?)`);
+                            MySQL.Query(`UPDATE vip SET count=count+20 WHERE name=(SELECT user FROM orderform WHERE _id=?) AND phone=(SELECT phone FROM orderform WHERE _id=?)`, [id, id]);
                         }
                     } else {
                         NS.Send(res, NS.Build(400, "处理失败"));

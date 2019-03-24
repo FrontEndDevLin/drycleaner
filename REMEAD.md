@@ -332,19 +332,71 @@
 ```
 
 
+广播给所有人
+```
+    http://192.168.2.108:4449/inform/noticeofall
+    method: get,
+    param: {
+        content: string
+    }
+```
+广播给店长
+```
+    http://192.168.2.108:4449/inform/noticeofmanager
+    method: get,
+    param: {
+        content: string,
+        managerId: [number] // 不传默认所有店长
+    }
+```
+
+广播给指定店铺
+```
+    http://192.168.2.108:4449/inform/noticeofstore
+    method: get,
+    param: {
+        content: string,
+        storeId: number
+    }
+```
+
+广播给自己的员工(店长身份)
+```
+    http://192.168.2.108:4449/inform/noticeofstaff
+    method: get,
+    param: {
+        content: string
+    }
+```
+
+获取未读消息数量
+```
+    http://192.168.2.108:4449/inform/getnoticeCount
+    method: get
+```
+
+获取消息列表
+```
+    http://192.168.2.108:4449/inform/getnoticeList
+    method: get,
+    param: {
+        pno: [number] 默认为1
+    }
+```
+
 ## 功能:
 ### ~~登录/注销~~
 
-### 今日数据统计(echart)
+### ~~今日数据统计(echart)~~
 
-### 个人信息
+### ~~个人信息~~
 1. ~~展示~~
-2. 修改，上传头像
+2. ~~修改，上传头像~~
 
-### 历史数据统计(可筛选日期)
+### ~~历史数据统计(可筛选日期)~~
 
 ### 衣服管理
-1. 查看库存衣物
+1. ~~查看库存衣物~~
 2. ~~价格表~~(~~可添加~~，~~删除~~)
 
 ### 订单管理

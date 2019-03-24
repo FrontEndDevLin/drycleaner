@@ -89,4 +89,16 @@ CREATE Table Config(
     page404 VARCHAR(256)
 );
 
+
+CREATE Table Inform(
+    _id INT PRIMARY KEY AUTO_INCREMENT,
+    sender INT NOT NULL,
+    tar INT NOT NULL,
+    type VARCHAR(16) DEFAULT '',
+    content VARCHAR(512) DEFAULT '',
+    stime BIGINT NOT NULL,
+    readed TINYINT DEFAULT 0
+);
+
+
 INSERT INTO Member VALUES(null, "CEO", 1, 13622222222, DEFAULT, 99, md5("123abc"), "avatar/default/default_003.jpg", 0, 1552902178513, DEFAULT, DEFAULT, DEFAULT);
