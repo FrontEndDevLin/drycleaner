@@ -3,7 +3,7 @@
 
 		<!--列表-->
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-			<el-table-column class="status" type="vid" width="55">
+			<el-table-column class="status" type="nid" width="55">
 			</el-table-column>
 			<el-table-column class="status" type="index" width="60">
         <template slot-scope="scope">
@@ -56,10 +56,11 @@
 
 		<el-dialog title="通知" v-model="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="标题" prop="name">
+				<el-form-item label="" prop="title">
+          <span>标题：<b>{{editForm.title}}</b></span>
 				</el-form-item>
-				<el-form-item label="具体内容">
-					具体内容……
+				<el-form-item label="" prop="content">
+					<span>内容：{{editForm.content}}</span>
 				</el-form-item>
 			</el-form>
 		</el-dialog>
@@ -98,7 +99,9 @@ export default {
       },
       //编辑界面数据
       editForm: {
-        vid: 0
+        nid: 0,
+        title:'',
+        content:''
       }
     };
   },
@@ -125,7 +128,7 @@ export default {
             this.users = [];
             for (let i = 0; i < res.data.items.length; i++) {
               this.users.push({
-                vid: res.data.items[i]._id,
+                nid: res.data.items[i]._id,
                 sender: res.data.items[i].sender,
                 readed: res.data.items[i].readed,
                 title: res.data.items[i].title,
@@ -146,32 +149,28 @@ export default {
           console.log(err);
         });
     },
-    //删除
-    handleDel: function(index, row) {
-      this.$confirm("确认删除该记录吗?", "提示", {
-        type: "warning"
-      })
-        .then((res) => {
-          this.listLoading = true;
-          let para = { id: row.id };
-          removeUser(para).then(res => {
-            this.listLoading = false;
-            this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.getUsers(this.page);
-          });
-        })
-        .catch((err) => {
-          console.log(err)
-          this.listLoading = false;
-        });
-    },
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true;
       this.editForm = Object.assign({}, row);
+      console.log(12,this.editForm)
+      httpGet("/inform/readnotice", this.editForm)
+        .then(res => {
+          console.log(res)
+          this.listLoading = false;
+          if (res.code == 200) {
+            this.getUsers(this.page)
+          } else {
+            this.$message({
+              message: res.msg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(() => {
+          this.listLoading = false;
+          console.log(err);
+        });
     },
     selsChange: function(sels) {
       this.sels = sels;
@@ -191,6 +190,6 @@ export default {
   white-space: nowrap;
 }
 .el-table .cell span.read{
-  color: #888686;
+  color: #afadad;
 }
 </style>

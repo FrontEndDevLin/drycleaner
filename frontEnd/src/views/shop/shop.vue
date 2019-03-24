@@ -15,9 +15,9 @@
 			</el-table-column>
 			<el-table-column type="index" min-width="40">
 			</el-table-column>
-			<el-table-column prop="newName" label="店铺名称" min-width="120">
+			<el-table-column prop="storeName" label="店铺名称" min-width="120">
 			</el-table-column>
-			<el-table-column prop="vid" label="店铺编号" min-width="120">
+			<el-table-column prop="storeId" label="店铺编号" min-width="120">
 			</el-table-column>
 			<el-table-column prop="time" label="开店日期" min-width="180">
         <template slot-scope="scope">
@@ -26,7 +26,7 @@
 			</el-table-column>
 			<el-table-column prop="owname" label="店铺店长" min-width="120">
 			</el-table-column>
-			<el-table-column prop="dec" label="店铺简介" min-width="180">
+			<el-table-column prop="intro" label="店铺简介" min-width="180">
 			</el-table-column>
 			<el-table-column label="操作" min-width="200">
 				<template slot-scope="scope">
@@ -46,10 +46,10 @@
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="店铺名称" prop="newName">
-					<el-input v-model="editForm.newName" auto-complete="off"></el-input>
+					<el-input v-model="editForm.storeName" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="店铺简介" prop="dec">
-					<el-input type="textarea" v-model="editForm.dec" auto-complete="off"></el-input>
+					<el-input type="textarea" v-model="editForm.intro" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -97,14 +97,13 @@ export default {
       editFormVisible: false, //编辑界面是否显示
       editLoading: false,
       editFormRules: {
-        newName: [{ required: true, message: "请输入姓名", trigger: "blur" }]
+        storeName: [{ required: true, message: "请输入姓名", trigger: "blur" }]
       },
       //编辑界面数据
       editForm: {
-        vid: 0,
-        newName: "",
-        time: "",
-        dec: ""
+        storeId: 0,
+        storeName: "",
+        intro: ""
       },
 
       addFormVisible: false, //新增界面是否显示
@@ -139,10 +138,10 @@ export default {
             this.users = [];
             for (let i = 0; i < res.data.items.length; i++) {
               this.users.push({
-                vid: res.data.items[i]._id,
-                newName: res.data.items[i].name,
+                storeId: res.data.items[i]._id,
+                storeName: res.data.items[i].name,
                 time: res.data.items[i].rgt,
-                dec: res.data.items[i].intro,
+                intro: res.data.items[i].intro,
                 owname: res.data.items[i].owname
               });
             }
@@ -190,25 +189,36 @@ export default {
       this.addFormVisible = true;
     },
     //编辑
-    editSubmit: function() {
+    editSubmit() {
       this.$refs.editForm.validate(valid => {
         if (valid) {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
             this.editLoading = true;
-            editUser(para).then(res => {
-              this.editLoading = false;              
-              this.$message({
-                message: res.msg,
-                type: "success"
-              });
-              this.$refs["editForm"].resetFields();
+            let para = Object.assign({}, this.editForm);
+            console.log(para);
+            httpPost("/store/editstore", para).then(res => {
+              console.log("edit", res);
+              this.editLoading = false;
               this.editFormVisible = false;
-              this.getUsers();
+              if (res.code == 200) {
+                this.$message({
+                  message: res.msg,
+                  type: "success"
+                });
+                this.$refs["editForm"].resetFields();
+                this.getUsers(this.page);
+              } else {
+                this.$message({
+                  message: res.msg,
+                  type: "warning"
+                });
+              }
+            })
+            .catch(err=>{
+              console.log(err)
+              this.editLoading = false;
+              this.editFormVisible = false;
             });
-          })
-          .catch(err=>{
-            console.log(err)
-            this.editLoading = false;     
           });
         }
       });
