@@ -50,7 +50,9 @@
                 <el-menu-item v-for="child in item.children" :index="child.path" :key="child.id" v-if="!child.hidden&&child.id!=0&&level==99">{{child.name}}</el-menu-item>
               </el-submenu>
 
-              <el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+              <el-menu-item v-if="!item.shop&&item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
+
+              <el-menu-item v-if="item.shop&&item.leaf&&item.children.length>0&&level==99" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
             <!-- </div> -->
           </template>
 				</el-menu>
