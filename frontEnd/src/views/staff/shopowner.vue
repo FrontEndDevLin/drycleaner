@@ -85,7 +85,7 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="员工名称" prop="name">
 					<el-input v-model="addForm.name" auto-complete="off"></el-input>
 				</el-form-item>

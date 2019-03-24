@@ -41,7 +41,7 @@
 					<el-input v-model="addForm.title" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="价格">
-					<el-input-number v-model="editForm.price" :min="10"></el-input-number>
+					<el-input-number v-model="addForm.price" :min="10"></el-input-number>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -223,6 +223,7 @@ export default {
             httpGet("/cloth/addcommodit", this.addForm)
               .then(res => {
                 console.log("price", res);
+                console.log('price this.addForm',this.addForm)
                 this.addFormVisible = false;
                 this.addLoading = false;
                 if (res.code == 200) {

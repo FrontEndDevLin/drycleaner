@@ -111,6 +111,7 @@ let routes = [
         name: '',
         iconCls: 'fa fa-university',
         leaf: true,//只有一个节点
+        shop:true,
         children: [
             { path: '/shop', component: shop, name: '店铺管理' }
         ]
