@@ -97,6 +97,9 @@ function Store() {
                 if (!NS.MethodFilter(req, res, "post")) return;
                 NS.GetPostData(req, (postParam) => {
                     let store = postParam["storeId"], name = postParam["storeName"], intro = postParam["intro"];
+                    if (!store || !name || !intro) {
+                        return NS.Send(res, NS.Build(403, "拒绝访问"))
+                    }
                     MySQL.Query(`SELECT _id FROM store WHERE name=?`, [name], (err, result) => {
                         if (err) throw err;
                         if (result && result.length) {
