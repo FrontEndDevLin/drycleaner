@@ -133,11 +133,12 @@ let routes = [
         component: Home,
         name: '通知管理',
         iconCls: 'fa fa-cubes',
+        notice:true,
         children: [
-            { path: '/web_all', component: webAll, name: '全体通知' },
-            { path: '/web_shop', component: webShop, name: '店铺通知' },
-            { path: '/web_owner', component: webOwner, name: '店长通知' },
-            { path: '/web_staff', component: webStaff, name: '员工通知' }
+            { path: '/web_all', component: webAll, name: '全体通知',id:1 },
+            { path: '/web_shop', component: webShop, name: '店铺通知' ,id:2},
+            { path: '/web_owner', component: webOwner, name: '店长通知' ,id:3},
+            { path: '/web_staff', component: webStaff, name: '员工通知', id:4}
         ]
     },
     // {
