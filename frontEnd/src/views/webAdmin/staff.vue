@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import {httpGet} from '../../api/api';
+import { httpGet } from "../../api/api";
 export default {
   data() {
     return {
@@ -30,15 +30,15 @@ export default {
   },
   methods: {
     onSubmit() {
-		console.log( this.form)
-	this.Loading = true;
-      httpGet("/inform/noticeofall", this.form)
+      console.log(this.form);
+      this.Loading = true;
+      httpGet("/inform/noticeofstaff", this.form)
         .then(res => {
           this.Loading = false;
           if (res.code == 200) {
             console.log("res get", res);
-			this.$refs["form"].resetFields();
-			this.$message({
+            this.$refs["form"].resetFields();
+            this.$message({
               message: res.msg,
               type: "success"
             });

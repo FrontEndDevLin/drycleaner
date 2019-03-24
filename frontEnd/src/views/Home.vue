@@ -9,19 +9,22 @@
 					<i class="fa fa-align-justify"></i>
 				</div>
 			</el-col>
-      <!-- <el-col :span="1" class="bell">
+      <el-col :span="1" class="bell">
         <el-dropdown trigger="hover">
 					<span class="el-dropdown-link box">
             <span class="item">
               <i class="fa fa-bell"></i>
-              <i class="fa fa-circle"></i>
+              <i v-if="count>0" class="fa fa-circle"></i>
             </span>
           </span>
 					<el-dropdown-menu slot="dropdown">
-						<el-dropdown-item divided @click.native="$router.push('/notice')">通知</el-dropdown-item>
+						<el-dropdown-item divided @click.native="$router.push('/notice')">
+            通知
+              <i v-if="count>0" class="fa fa-circle"></i>
+            </el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
-      </el-col> -->
+      </el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
 					<span class="el-dropdown-link userinfo-inner"><img :src="this.sysUserAvatar" /> {{sysUserName}}</span>
@@ -114,7 +117,7 @@
 </template>
 
 <script>
-import {httpPost} from '../api/api';
+import { httpPost, httpGet } from "../api/api";
 export default {
   data() {
     return {
@@ -141,27 +144,28 @@ export default {
         time: "",
         dec: ""
       },
-      level: 0,//99-ceo,9-店长,0-员工
+      level: 0, //99-ceo,9-店长,0-员工
+      count: 0
     };
   },
   methods: {
     checkLog() {
-      httpPost('/auth/checklogin')
-      .then((res)=>{
-        console.log('checkLog',res)
-        if(res.code !== 200){
-          sessionStorage.removeItem("user");
-          this.$router.push("/login");
-        }else{
-          this.sysUserName = res.data.dc_name;
-          this.sysUserAvatar = res.data.dc_avatar;
-          this.sysUserId = res.data.dc_uid;
-          this.level = res.data.dc_level;
-        }
-      })
-      .catch(err => {
-        console.log('err',err)
-      });
+      httpPost("/auth/checklogin")
+        .then(res => {
+          console.log("checkLog", res);
+          if (res.code !== 200) {
+            sessionStorage.removeItem("user");
+            this.$router.push("/login");
+          } else {
+            this.sysUserName = res.data.dc_name;
+            this.sysUserAvatar = res.data.dc_avatar;
+            this.sysUserId = res.data.dc_uid;
+            this.level = res.data.dc_level;
+          }
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
     },
     onSubmit() {
       console.log("submit!");
@@ -180,18 +184,17 @@ export default {
         //type: 'warning'
       })
         .then(() => {
-          httpPost('/auth/logout')
-          .then(res=>{
-            console.log('logout',res)
-            if(res.code === 200){
-              sessionStorage.removeItem("user");
-              this.$router.push("/login");
-            }
-          })
-          .catch(err=>{
-            console.log(err)
-          })
-          
+          httpPost("/auth/logout")
+            .then(res => {
+              console.log("logout", res);
+              if (res.code === 200) {
+                sessionStorage.removeItem("user");
+                this.$router.push("/login");
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
         })
         .catch(() => {});
     },
@@ -204,10 +207,30 @@ export default {
         "submenu-hook-" + i
       )[0].style.display = status ? "block" : "none";
     },
-
+    getNotice() {
+      console.log(1);
+      httpGet("/inform/getnoticeCount")
+        .then(res => {
+          console.log("count get", res);
+          this.listLoading = false;
+          if (res.code == 200) {
+            this.count = res.data.count;
+          } else {
+            this.$message({
+              message: res.msg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(() => {
+          this.listLoading = false;
+          console.log(err);
+        });
+    }
   },
   created() {
     this.checkLog();
+    this.getNotice();
   },
   mounted() {
     // console.log(this.$router.options.routes);
@@ -223,7 +246,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "~scss_vars";
-
+.fa-circle {
+  font-size: 5px;
+  color: red;
+  transform: scale(0.6);
+  top: -7px;
+  right: -11px;
+}
 .container {
   position: absolute;
   top: 0px;
@@ -234,6 +263,7 @@ export default {
     line-height: 60px;
     background: $color-primary;
     color: #fff;
+
     .bell {
       text-align: left;
       float: right;
@@ -242,14 +272,14 @@ export default {
       .box {
         display: inline-block;
         text-align: center;
-        .item{
+        .item {
           display: inline-block;
           width: 14px;
-          height: 14px;          
+          height: 14px;
           position: relative;
-          .fa{
+          .fa {
             position: absolute;
-            &.fa-bell{
+            &.fa-bell {
               color: #fff;
             }
             &.fa-circle {
