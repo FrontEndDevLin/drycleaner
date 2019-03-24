@@ -3,46 +3,64 @@
 
 		<!--列表-->
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-			<el-table-column class="status" type="selection" width="55">
+			<el-table-column class="status" type="nid" width="55">
 			</el-table-column>
 			<el-table-column class="status" type="index" width="60">
         <template slot-scope="scope">
-          <span v-if="true" :class="[scope.$index<3?'read':'']">{{ scope.$index }}</span>
-          <!-- <span v-else style="color: #6b6d6e">{{ scope.row.index }}</span> -->
+          <span v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.$index }}</span>
         </template>
 			</el-table-column>
-			<el-table-column class="status" prop="name" label="标题" width="180" sortable>
+			<el-table-column class="status" prop="title" label="标题" width="120" 
+      >
         <template slot-scope="scope">
-          <span v-if="true" :class="[scope.$index<3?'read':'']">{{ scope.row.name }}</span>
-          <!-- <span v-else style="color: #6b6d6e">{{ scope.row.name }}</span> -->
+          <span class="notice_content" v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.row.title }}</span>
         </template>
 			</el-table-column>
-			<el-table-column class="status" prop="read" label="状态" width="100" sortable>
+			<el-table-column class="status" prop="content" label="具体内容" width="120" 
+      >
         <template slot-scope="scope">
-          <span v-if="true" :class="[scope.$index<3?'read':'']">{{ scope.row.read }}</span>
-          <!-- <span v-else style="color: #6b6d6e">{{ scope.row.read }}</span> -->
+          <span class="notice_content" v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.row.content }}</span>
         </template>
 			</el-table-column>
-			<el-table-column class="status" prop="dec" label="具体内容" min-width="200" sortable>
+			<el-table-column class="status" prop="sender" label="发布人" width="120" 
+      >
         <template slot-scope="scope">
-          <span v-if="true" :class="[scope.$index<3?'read':'']">{{ scope.row.dec }}</span>
-          <!-- <span v-else style="color: #6b6d6e">{{ scope.row.dec }}</span> -->
+          <span v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.row.sender }}</span>
+        </template>
+			</el-table-column>
+			<el-table-column class="status" prop="stime" label="通知时间" min-width="120" 
+      >
+        <template slot-scope="scope">
+          <span v-if="true" :class="[scope.row.readed==1?'read':'']">{{new Date(parseInt(scope.row.stime)).toLocaleString().replace(/:\d{1,2}$/,' ') }}</span>
+        </template>
+			</el-table-column>
+			<el-table-column class="status" prop="type" label="通知类型" min-width="120" 
+      >
+        <template slot-scope="scope">
+          <span v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.row.type }}</span>
+        </template>
+			</el-table-column>
+			<el-table-column class="status" prop="readed" label="状态" min-width="120" 
+      >
+        <template slot-scope="scope">
+          <span v-if="true" :class="[scope.row.readed==1?'read':'']">{{ scope.row.readed==1?'已读':'未读' }}</span>
         </template>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">查看</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<!-- <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button> -->
 				</template>
 			</el-table-column>
 		</el-table>
 
 		<el-dialog title="通知" v-model="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="标题" prop="name">
+				<el-form-item label="" prop="title">
+          <span>标题：<b>{{editForm.title}}</b></span>
 				</el-form-item>
-				<el-form-item label="具体内容">
-					具体内容……
+				<el-form-item label="" prop="content">
+					<span>内容：{{editForm.content}}</span>
 				</el-form-item>
 			</el-form>
 		</el-dialog>
@@ -81,25 +99,9 @@ export default {
       },
       //编辑界面数据
       editForm: {
-        id: 0,
-        name: "",
-        price: 0,
-        time: "",
-        dec: ""
-      },
-
-      addFormVisible: false, //新增界面是否显示
-      addLoading: false,
-      addFormRules: {
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }]
-      },
-      //新增界面数据
-      addForm: {
-        name: "",
-        price: 0,
-        time: "",
-        dec: "",
-        isRead: true
+        nid: 0,
+        title:'',
+        content:''
       }
     };
   },
@@ -110,194 +112,84 @@ export default {
     },
     handleCurrentChange(val) {
       this.page = val;
-      this.getUsers();
+      this.getUsers(this.page);
     },
     //获取用户列表
-    getUsers() {
-      //   let para = {
-      //     page: this.page,
-      //     name: this.filters.name
-      //   };
-      //   this.listLoading = true;
-      //   
-      //   getUserListPage(para).then(res => {
-      //     this.total = res.data.total;
-      //     this.users = res.data.users;
-      //     this.listLoading = false;
-      //     
-      //   });
-      this.total = 1; //delete
-      this.listLoading = false;
-      this.users = []; //delete
-
-      for (let i = 0; i < 86; i++) {
-        //delete
-        this.users.push(
-          Mock.mock({
-            id: Mock.Random.guid(),
-            read: '已读',
-            name: Mock.Random.cname(),
-            dec: Mock.mock("@county(true)"),
-            "age|18-60": 1,
-            time: Mock.Random.date(),
-            sex: Mock.Random.integer(0, 1)
-          })
-        );
-      }
-
-      //   let param = {
-      //     title: "长袖", // unique
-      //     price: 20, // default 10
-      //     type: 0 // default 0  0代表织物类 基本只有这个
-      //   };
-
-      //   httpGet("/cloth/addcommodit",param)
-      //   .then(res => {
-      // 	  console.log('cloth/addcommodit',res)
-      //   })
-      //   .catch( ()=>{
-      // 	  this.listLoading = false;
-      //   });
-    },
-    //删除
-    handleDel: function(index, row) {
-      this.$confirm("确认删除该记录吗?", "提示", {
-        type: "warning"
-      })
-        .then(() => {
-          this.listLoading = true;
-          
-          let para = { id: row.id };
-          removeUser(para).then(res => {
-            this.listLoading = false;
-            
+    getUsers(page) {
+      let param = {
+        pno: page // 当前页码 不传的话默认1
+      };
+      httpGet("/inform/getnoticeList", param)
+        .then(res => {
+          this.listLoading = false;
+          if (res.code == 200) {
+            console.log("users get", res);
+            this.total = res.data.informCount;
+            this.users = [];
+            for (let i = 0; i < res.data.items.length; i++) {
+              this.users.push({
+                nid: res.data.items[i]._id,
+                sender: res.data.items[i].sender,
+                readed: res.data.items[i].readed,
+                title: res.data.items[i].title,
+                content: res.data.items[i].content,
+                stime: res.data.items[i].stime,
+                type: res.data.items[i].type
+              });
+            }
+          } else {
             this.$message({
-              message: "删除成功",
-              type: "success"
+              message: res.msg,
+              type: "warning"
             });
-            this.getUsers();
-          });
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          this.listLoading = false;
+          console.log(err);
+        });
     },
     //显示编辑界面
     handleEdit: function(index, row) {
       this.editFormVisible = true;
       this.editForm = Object.assign({}, row);
-    },
-    //显示新增界面
-    handleAdd: function() {
-      this.addFormVisible = true;
-      this.addForm = {
-        name: "",
-        sex: -1,
-        age: 0,
-        time: "",
-        dec: ""
-      };
-    },
-    //编辑
-    editSubmit: function() {
-      this.$refs.editForm.validate(valid => {
-        if (valid) {
-          this.$confirm("确认提交吗？", "提示", {}).then(() => {
-            this.editLoading = true;
-            
-            let para = Object.assign({}, this.editForm);
-            para.time =
-              !para.time || para.time == ""
-                ? ""
-                : util.formatDate.format(new Date(para.time), "yyyy-MM-dd");
-            editUser(para).then(res => {
-              this.editLoading = false;
-              
-              this.$message({
-                message: "提交成功",
-                type: "success"
-              });
-              this.$refs["editForm"].resetFields();
-              this.editFormVisible = false;
-              this.getUsers();
+      console.log(12,this.editForm)
+      httpGet("/inform/readnotice", this.editForm)
+        .then(res => {
+          console.log(res)
+          this.listLoading = false;
+          if (res.code == 200) {
+            this.getUsers(this.page)
+          } else {
+            this.$message({
+              message: res.msg,
+              type: "warning"
             });
-          });
-        }
-      });
-    },
-    //新增
-    addSubmit: function() {
-      this.$refs.addForm.validate(valid => {
-        if (valid) {
-          this.$confirm("确认提交吗？", "提示", {}).then(() => {
-            this.addLoading = true;
-            
-            // let para = Object.assign({}, this.addForm);
-            // para.time =
-            //   !para.time || para.time == ""
-            //     ? ""
-            //     : util.formatDate.format(new Date(para.time), "yyyy-MM-dd");
-            // addUser(para).then(res => {
-            //   this.addLoading = false;
-            //   
-            //   this.$message({
-            //     message: "提交成功",
-            //     type: "success"
-            //   });
-            //   this.$refs["addForm"].resetFields();
-            //   this.addFormVisible = false;
-            //   this.getUsers();
-            // });
-            let param = {
-              title: "长袖", // unique
-              price: 20, // default 10
-              type: 0 // default 0  0代表织物类 基本只有这个
-            };
-			httpGet("/cloth/addcommodit",param)
-			.then((res)=>{
-				this.addLoading = false;
-				console.log(33,res)
-			})
-			.catch((err)=>{
-				this.addLoading = false;
-				console.log(err)
-			});
-          });
-        }
-      });
+          }
+        })
+        .catch(() => {
+          this.listLoading = false;
+          console.log(err);
+        });
     },
     selsChange: function(sels) {
       this.sels = sels;
-    },
-    //批量删除
-    batchRemove: function() {
-      var ids = this.sels.map(item => item.id).toString();
-      this.$confirm("确认删除选中记录吗？", "提示", {
-        type: "warning"
-      })
-        .then(() => {
-          this.listLoading = true;
-          
-          let para = { ids: ids };
-          batchRemoveUser(para).then(res => {
-            this.listLoading = false;
-            
-            this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.getUsers();
-          });
-        })
-        .catch(() => {});
     }
   },
   mounted() {
-    this.getUsers();
+    this.getUsers(this.page);
   }
 };
 </script>
 
 <style>
+.notice_content{
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .el-table .cell span.read{
-  color: #888686;
+  color: #afadad;
 }
 </style>

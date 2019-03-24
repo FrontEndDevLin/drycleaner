@@ -6,10 +6,10 @@
 		<el-form-item label="具体内容" prop="content">
 			<el-input type="textarea" v-model="form.content"></el-input>
 		</el-form-item>
-		<el-form-item label="选择店铺" prop="storeId">
-          <el-select v-model="form.storeId" placeholder="请选择" min-width="600px">
+		<el-form-item label="选择店长" prop="managerId">
+          <el-select v-model="form.managerId" placeholder="请选择" min-width="600px">
             <el-option
-              v-for="(item,index) in shop"
+              v-for="(item,index) in owner"
               :key="index"
               :label="item.newName"
               :value="item.vid">
@@ -30,22 +30,22 @@ export default {
       form: {
         title: "",
         content: "",
-        storeId: "" //number
+        managerId: "" //number
       },
       rules: {
         title: { required: true, message: "请输入标题", trigger: "blur" },
         content: { required: true, message: "请输入内容", trigger: "blur" },
-        storeId: { required: true, message: "请选择店铺", trigger: "blur" }
+        managerId: { required: true, message: "请选择店铺", trigger: "blur" }
       },
       Loading: false,
-      shop: []
+      owner: []
     };
   },
   methods: {
     onSubmit() {
       console.log(this.form);
       this.Loading = true;
-      httpGet("/inform/noticeofstore", this.form)
+      httpGet("/inform/noticeofmanager", this.form)
         .then(res => {
           this.Loading = false;
           if (res.code == 200) {
@@ -72,15 +72,15 @@ export default {
         pno: 1, // 当前页码 不传的话默认1
         all: true
       };
-      httpGet("/store/getstorelist", param)
+      httpGet("/staff/getmanagerlist", param)
         .then(res => {
           this.listLoading = false;
           if (res.code == 200) {
-            console.log("shop get", res);
-            this.shop = [];
+            console.log("owner get", res);
+            this.owner = [];
             for (let i = 0; i < res.data.items.length; i++) {
-              this.shop.push({
-                vid: res.data.items[i]._id,
+              this.owner.push({
+                vid: res.data.items[i].id,
                 newName: res.data.items[i].name
               });
             }
