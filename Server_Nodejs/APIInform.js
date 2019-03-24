@@ -45,7 +45,7 @@ function Inform() {
                             }
                         })
                     } else {
-                        NS.Send(res, NS.Build(403, "查询错误"))
+                        NS.Send(res, NS.Build(403, "该店铺没有员工"))
                     }
                 })
             } break;
@@ -78,7 +78,7 @@ function Inform() {
                             }
                         })
                     } else {
-                        NS.Send(res, NS.Build(403, "查询错误"))
+                        NS.Send(res, NS.Build(403, "该店铺没有员工"))
                     }
                 })
             } break;
@@ -107,20 +107,22 @@ function Inform() {
                             }
                         })
                     } else {
-                        NS.Send(res, NS.Build(403, "查询错误"))
+                        NS.Send(res, NS.Build(403, "该店铺没有员工"))
                     }
                 })
             } break;
             case 'noticeofstaff': {
                 if (!NS.MethodFilter(req, res, "get")) return;
-                if (level != 9) return;
+                if (level != 9) {
+                    return NS.Send(res, NS.Build(403, "拒绝访问"))
+                }
                 let content = param["content"], title = param["title"];
-                if (!content || !title || !store) {
+                if (!content || !title) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
 
                 let sql = `SELECT _id FROM member WHERE del=? AND store=(SELECT store FROM member WHERE _id=${uid}) AND level=?`;
-                MySQL.Query(sql, [1, store, 0], (err, result) => {
+                MySQL.Query(sql, [1, 0], (err, result) => {
                     if (err) throw err;
                     if (result && result.length) {
                         let insSql = `INSERT INTO inform VALUES `;
@@ -137,13 +139,13 @@ function Inform() {
                             }
                         })
                     } else {
-                        NS.Send(res, NS.Build(403, "查询错误"))
+                        NS.Send(res, NS.Build(403, "该店铺没有员工"))
                     }
                 })
             } break;
-            case 'getnoticeCount': {
+            case 'getnoticecount': {
                 if (!NS.MethodFilter(req, res, "get")) return;
-                let unReadCountSql = `SELECT count(_id) AS unreadCount FROM inform WHERE readed=? AND _id=?`;
+                let unReadCountSql = `SELECT count(_id) AS unreadCount FROM inform WHERE readed=? AND tar=?`;
                 MySQL.Query(unReadCountSql, [0, uid], (err, result) => {
                     if (err) throw err;
                     if (result && result[0].unreadCount >= 0) {
@@ -153,13 +155,13 @@ function Inform() {
                     }
                 });
             } break;
-            case 'getnoticeList': {
+            case 'getnoticelist': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 let pno = param["pno"] || 1;
                 let pageSize = 12;
                 let progress = 0;
                 let rspData = { pno: pno, formCount: '', pCount: '', items: [], unreadCount: '' };
-                let unReadCountSql = `SELECT count(_id) AS unreadCount FROM inform WHERE readed=? AND _id=?`;
+                let unReadCountSql = `SELECT count(_id) AS unreadCount FROM inform WHERE readed=? AND tar=?`;
                 MySQL.Query(unReadCountSql, [0, uid], (err, result) => {
                     if (err) throw err;
                     if (result && result[0].unreadCount >= 0) {
@@ -174,7 +176,7 @@ function Inform() {
                     }
                 });
 
-                let countSql = `SELECT count(_id) AS count FROM inform WHERE _id=?`;
+                let countSql = `SELECT count(_id) AS count FROM inform WHERE tar=?`;
                 MySQL.Query(countSql, [uid], (err, result) => {
                     if (err) throw err;
                     if (result && result[0].count >= 0) {
@@ -192,7 +194,7 @@ function Inform() {
                     }
                 });
 
-                let selSql = `SELECT _id, (SELECT name FROM member WHERE _id=tar) AS sender, type, content, stime FROM inform WHERE _id=? ORDER BY readed LIMIT ?, ?`;
+                let selSql = `SELECT _id, (SELECT name FROM member WHERE _id=tar) AS sender, type, title, content, readed, stime FROM inform WHERE tar=? ORDER BY readed LIMIT ?, ?`;
                 MySQL.Query(selSql, [uid, (pno - 1) * pageSize, pageSize], (err, result) => {
                     if (err) throw err;
                     if (result && result.length >= 0) {
