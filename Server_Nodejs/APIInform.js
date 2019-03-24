@@ -213,7 +213,7 @@ function Inform() {
                 let id = param["nid"];
                 if (!id) return;
                 let sql = `UPDATE inform SET readed=? WHERE _id=?`;
-                MySQL.Query(sql, (1, id), (err, result) => { 
+                MySQL.Query(sql, [1, id], (err, result) => { 
                     if (err) throw err;
                     if (result && result.affectedRows == 1) {
                         NS.Send(res, NS.Build(200, "阅读成功"))
