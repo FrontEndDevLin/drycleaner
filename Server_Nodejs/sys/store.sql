@@ -89,12 +89,13 @@ CREATE Table Config(
     page404 VARCHAR(256)
 );
 
-
+drop table if EXISTS inform;
 CREATE Table Inform(
     _id INT PRIMARY KEY AUTO_INCREMENT,
     sender INT NOT NULL,
     tar INT NOT NULL,
     type VARCHAR(16) DEFAULT '',
+    title VARCHAR(64) NOT NULL,
     content VARCHAR(512) DEFAULT '',
     stime BIGINT NOT NULL,
     readed TINYINT DEFAULT 0

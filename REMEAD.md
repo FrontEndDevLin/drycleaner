@@ -337,6 +337,7 @@
     http://192.168.2.108:4449/inform/noticeofall
     method: get,
     param: {
+        title: string,
         content: string
     }
 ```
@@ -345,6 +346,7 @@
     http://192.168.2.108:4449/inform/noticeofmanager
     method: get,
     param: {
+        title: string,
         content: string,
         managerId: [number] // 不传默认所有店长
     }
@@ -355,6 +357,7 @@
     http://192.168.2.108:4449/inform/noticeofstore
     method: get,
     param: {
+        title: string,
         content: string,
         storeId: number
     }
@@ -365,6 +368,7 @@
     http://192.168.2.108:4449/inform/noticeofstaff
     method: get,
     param: {
+        title: string,
         content: string
     }
 ```
@@ -383,6 +387,16 @@
         pno: [number] 默认为1
     }
 ```
+
+已读消息
+```
+    http://192.168.2.108:4449/inform/readnotice
+    method: get,
+    param: {
+        nid: number
+    }
+```
+
 
 ## 功能:
 ### ~~登录/注销~~
@@ -416,8 +430,8 @@
 2. ~~员工管理(~~CEO、店长可见~~) ~~CEO可见全体员工，店长可见所属员工~~
 
 ### 系统管理(CEO、店长可见)
-1. 全体通知(CEO可见)
-2. 店铺通知(CEO、店长可见)
+1. ~~全体通知(CEO可见)~~
+2. ~~店铺通知(CEO、店长可见)~~
 3. 网站信息(logo, 标题)
 
 ### 回收站
@@ -425,4 +439,4 @@
 2. 恢复和永久删除
 
 ### 右上角通知
-1. 有新通知时, 右上角闪烁
+1. ~~有新通知时, 右上角闪烁~~

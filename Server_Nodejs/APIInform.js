@@ -23,8 +23,8 @@ function Inform() {
             case 'noticeofall': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 if (level != 99) return;
-                let content = param["content"];
-                if (!content) {
+                let content = param["content"], title = param["title"];
+                if (!content || !title) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
                 let sql = `SELECT _id FROM member WHERE del=? AND level=? OR level=?`;
@@ -33,7 +33,7 @@ function Inform() {
                     if (result && result.length) {
                         let insSql = `INSERT INTO inform VALUES `;
                         for (let tmp of result) {
-                            insSql += `(NULL,${uid},${tmp["_id"]},'全体通知','${content}',${new Date().getTime()}, DEFAULT),`;
+                            insSql += `(NULL,${uid},${tmp["_id"]},'全体通知','${title}','${content}',${new Date().getTime()}, DEFAULT),`;
                         }
                         insSql = insSql.substr(0, insSql.length - 1);
                         MySQL.Query(insSql, [], (err, result) => {
@@ -52,8 +52,8 @@ function Inform() {
             case 'noticeofmanager': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 if (level != 99) return;
-                let content = param["content"];
-                if (!content) {
+                let content = param["content"], title = param["title"];
+                if (!content || !title) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
                 let target = param["managerId"] || "";
@@ -66,7 +66,7 @@ function Inform() {
                     if (result && result.length) {
                         let insSql = `INSERT INTO inform VALUES `;
                         for (let tmp of result) {
-                            insSql += `(NULL,${uid},${tmp["_id"]},'老板通知','${content}',${new Date().getTime()}, DEFAULT),`;
+                            insSql += `(NULL,${uid},${tmp["_id"]},'老板通知','${title}','${content}',${new Date().getTime()}, DEFAULT),`;
                         }
                         insSql = insSql.substr(0, insSql.length - 1);
                         MySQL.Query(insSql, [], (err, result) => {
@@ -85,8 +85,8 @@ function Inform() {
             case 'noticeofstore': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 if (level != 99) return;
-                let content = param["content"], store = param["storeId"];
-                if (!content || !store) {
+                let content = param["content"], title = param["title"], store = param["storeId"];
+                if (!content || !title || !store) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
                 let sql = `SELECT _id FROM member WHERE del=? AND store=?`;
@@ -95,7 +95,7 @@ function Inform() {
                     if (result && result.length) {
                         let insSql = `INSERT INTO inform VALUES `;
                         for (let tmp of result) {
-                            insSql += `(NULL,${uid},${tmp["_id"]},'店铺通知','${content}',${new Date().getTime()}, DEFAULT),`;
+                            insSql += `(NULL,${uid},${tmp["_id"]},'店铺通知','${title}','${content}',${new Date().getTime()}, DEFAULT),`;
                         }
                         insSql = insSql.substr(0, insSql.length - 1);
                         MySQL.Query(insSql, [], (err, result) => {
@@ -114,8 +114,8 @@ function Inform() {
             case 'noticeofstaff': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 if (level != 9) return;
-                let content = param["content"];
-                if (!content || !store) {
+                let content = param["content"], title = param["title"];
+                if (!content || !title || !store) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
 
@@ -125,7 +125,7 @@ function Inform() {
                     if (result && result.length) {
                         let insSql = `INSERT INTO inform VALUES `;
                         for (let tmp of result) {
-                            insSql += `(NULL,${uid},${tmp["_id"]},'本店通知','${content}',${new Date().getTime()}, DEFAULT),`;
+                            insSql += `(NULL,${uid},${tmp["_id"]},'本店通知','${title}','${content}',${new Date().getTime()}, DEFAULT),`;
                         }
                         insSql = insSql.substr(0, insSql.length - 1);
                         MySQL.Query(insSql, [], (err, result) => {
@@ -203,6 +203,20 @@ function Inform() {
                         }
                     } else {
                         NS.Send(res, NS.Build(406, "参数错误"));
+                    }
+                })
+            } break;
+            case 'readnotice': {
+                if (!NS.MethodFilter(req, res, "get")) return;
+                let id = param["nid"];
+                if (!id) return;
+                let sql = `UPDATE inform SET readed=? WHERE _id=?`;
+                MySQL.Query(sql, (1, id), (err, result) => { 
+                    if (err) throw err;
+                    if (result && result.affectedRows == 1) {
+                        NS.Send(res, NS.Build(200, "阅读成功"))
+                    } else {
+                        NS.Send(res, NS.Build(400, "阅读失败，未知原因"))
                     }
                 })
             } break;
