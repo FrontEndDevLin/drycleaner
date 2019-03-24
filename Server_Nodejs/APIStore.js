@@ -114,8 +114,8 @@ function Store() {
                     })
 
                     function doNext() {
-                        let sql = `UPDATE store SET name=? AND intro=?`;
-                        MySQL.Query(sql, [name, intro], (err, result) => {
+                        let sql = `UPDATE store SET name=?, intro=? WHERE _id=?`;
+                        MySQL.Query(sql, [name, intro, store], (err, result) => {
                             if (err) throw err;
                             if (result && result.affectedRows >= 0) {
                                 NS.Send(res, NS.Build(200, "修改成功"))

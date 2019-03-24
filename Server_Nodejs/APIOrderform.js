@@ -177,6 +177,21 @@ function Orderform() {
 
                 
             } break;
+            case 'delform': {
+                if (!NS.MethodFilter(req, res, "get")) return;
+                NS.GetPostData(req, (postParam) => {
+                    let id = postParam["fid"];
+                    let sql = `UPDATE orderform SET del=0 WHERE _id=?`;
+                    MySQL.Query(sql, [id], (err, result) => {
+                        if (err) throw err;
+                        if (result && result.affectedRows == 1) {
+                            NS.Send(res, NS.Build(200, "删除成功"));
+                        } else {
+                            NS.Send(res, NS.Build(400, "删除失败"));
+                        }
+                    })
+                })
+            } break;
             default:
                 break;
         }

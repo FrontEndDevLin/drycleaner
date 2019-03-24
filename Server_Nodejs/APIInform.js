@@ -194,7 +194,7 @@ function Inform() {
                     }
                 });
 
-                let selSql = `SELECT _id, (SELECT name FROM member WHERE _id=tar) AS sender, type, title, content, readed, stime FROM inform WHERE tar=? ORDER BY readed LIMIT ?, ?`;
+                let selSql = `SELECT _id, (SELECT name FROM member WHERE _id=sender) AS sender, type, title, content, readed, stime FROM inform WHERE tar=? ORDER BY readed LIMIT ?, ?`;
                 MySQL.Query(selSql, [uid, (pno - 1) * pageSize, pageSize], (err, result) => {
                     if (err) throw err;
                     if (result && result.length >= 0) {
