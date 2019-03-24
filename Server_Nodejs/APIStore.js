@@ -5,7 +5,7 @@
 let qs = require("querystring");
 let NS = require("./NameSpace");
 
-function Store () {
+function Store() {
     let url = require("url");
     let MySQL = require("./MySQLInterface");
 
@@ -53,6 +53,7 @@ function Store () {
             case 'getstorelist': {
                 if (!NS.MethodFilter(req, res, "get")) return;
                 let pno = param.pno || 1;
+                let isAll = param.all || null;
                 let pageSize = 12;
                 let progress = 0;
                 let rspData = { pno: pno, storeCount: '', pCount: '', items: [] };
@@ -74,8 +75,12 @@ function Store () {
                     }
                 });
 
-                let sqlSel = `SELECT _id, name, intro, own, (SELECT name FROM member WHERE _id = own and del=1 ) AS owname, rgt FROM store WHERE del=? ORDER BY rgt LIMIT ?, ?`;
-                MySQL.Query(sqlSel, [1, (pno - 1) * pageSize, pageSize], (err, result) => {
+
+                let sqlSel = `SELECT _id, name, intro, own, (SELECT name FROM member WHERE _id = own and del=1 ) AS owname, rgt FROM store WHERE del=? ORDER BY rgt`;
+                if (!isAll) {
+                    sqlSel += ` LIMIT ${(pno - 1) * pageSize}, ${pageSize}`;
+                }
+                MySQL.Query(sqlSel, [1], (err, result) => {
                     if (err) throw err;
                     if (result) {
                         rspData["items"] = result;
@@ -90,6 +95,33 @@ function Store () {
             } break;
             case 'editstore': {
                 if (!NS.MethodFilter(req, res, "post")) return;
+                NS.GetPostData(req, (postParam) => {
+                    let store = postParam["storeId"], name = postParam["storeName"], intro = postParam["intro"];
+                    MySQL.Query(`SELECT _id FROM store WHERE name=?`, [name], (err, result) => {
+                        if (err) throw err;
+                        if (result && result.length) {
+                            if (result[0]["_id"] == store) {
+                                NS.Send(res, NS.Build(406, "店铺名已存在"))
+                            } else {
+                                doNext();
+                            }
+                        } else {
+                            doNext();
+                        }
+                    })
+
+                    function doNext() {
+                        let sql = `UPDATE store SET name=? AND intro=?`;
+                        MySQL.Query(sql, [name, intro], (err, result) => {
+                            if (err) throw err;
+                            if (result && result.affectedRows >= 0) {
+                                NS.Send(res, NS.Build(200, "修改成功"))
+                            } else {
+                                NS.Send(res, NS.Build(406, "修改失败"))
+                            }
+                        })
+                    }
+                });
             } break;
             default:
                 break;

@@ -103,6 +103,7 @@ function Staff() {
                 if (level != 99) {
                     return NS.Send(res, NS.Build(403, "拒绝访问"))
                 }
+                let isAll = param["all"] || null;
                 let pno = param["pno"] || 1;
                 let pageSize = 12;
                 let progress = 0;
@@ -128,7 +129,12 @@ function Staff() {
 
                 let sql = `SELECT _id AS id, name, gender, phone, avatar, rgt, salary, (
                     SELECT name FROM store WHERE own=id
-                ) AS storename FROM member WHERE del=? AND level=? ORDER BY _id LIMIT ?, ?`;
+                ) AS storename FROM member WHERE del=? AND level=? ORDER BY _id`;
+
+                if (!isAll) {
+                    sql += ` LIMIT ${(pno - 1) * pageSize}, ${pageSize}`
+                }
+
                 MySQL.Query(sql, [1, 9, (pno - 1) * pageSize, pageSize], (err, result) => {
                     if (err) throw err;
                     if (result && result.length >= 0) {

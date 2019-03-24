@@ -337,6 +337,7 @@
     http://192.168.2.108:4449/inform/noticeofall
     method: get,
     param: {
+        title: string,
         content: string
     }
 ```
@@ -345,6 +346,7 @@
     http://192.168.2.108:4449/inform/noticeofmanager
     method: get,
     param: {
+        title: string,
         content: string,
         managerId: [number] // 不传默认所有店长
     }
@@ -355,6 +357,7 @@
     http://192.168.2.108:4449/inform/noticeofstore
     method: get,
     param: {
+        title: string,
         content: string,
         storeId: number
     }
@@ -365,6 +368,7 @@
     http://192.168.2.108:4449/inform/noticeofstaff
     method: get,
     param: {
+        title: string,
         content: string
     }
 ```
@@ -384,6 +388,27 @@
     }
 ```
 
+已读消息
+```
+    http://192.168.2.108:4449/inform/readnotice
+    method: get,
+    param: {
+        nid: number
+    }
+```
+
+编辑店铺
+```
+    http://192.168.2.108:4449/store/editstore
+    method: post,
+    param: {
+        storeId: number,
+        storeName: string,
+        intro: string
+    }
+```
+
+
 ## 功能:
 ### ~~登录/注销~~
 
@@ -393,7 +418,7 @@
 1. ~~展示~~
 2. ~~修改，上传头像~~
 
-### ~~历史数据统计(可筛选日期)~~
+### ~~历史数据统计~~
 
 ### 衣服管理
 1. ~~查看库存衣物~~
@@ -416,8 +441,8 @@
 2. ~~员工管理(~~CEO、店长可见~~) ~~CEO可见全体员工，店长可见所属员工~~
 
 ### 系统管理(CEO、店长可见)
-1. 全体通知(CEO可见)
-2. 店铺通知(CEO、店长可见)
+1. ~~全体通知(CEO可见)~~
+2. ~~店铺通知(CEO、店长可见)~~
 3. 网站信息(logo, 标题)
 
 ### 回收站
@@ -425,4 +450,4 @@
 2. 恢复和永久删除
 
 ### 右上角通知
-1. 有新通知时, 右上角闪烁
+1. ~~有新通知时, 右上角闪烁~~
