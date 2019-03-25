@@ -2,21 +2,21 @@
     <section class="chart-container">
         <el-row>
             <el-col :span="12" class="box">
-                <div id="chartColumn" style="width:100%; height:400px;"></div>
+                <div class="cav" id="chartColumn" style="width:100%; height:400px;"></div>
                 <span class="date">
-                  <el-date-picker @change="change1" type="date" placeholder="选择日期" v-model="select.top6CommDay" style="width: 100%;"></el-date-picker>
+                  <el-date-picker @change="change1" type="date" placeholder="选择日期" v-model="top6CommDay" style="width: 100%;"></el-date-picker>
                 </span>
             </el-col>
             <el-col :span="12" class="box">
-                <div id="chartLine" style="width:100%; height:400px;"></div>
-                <span class="date">
-                  <el-date-picker @change="change2" type="date" placeholder="选择日期" v-model="select.top5StaffDay" style="width: 100%;"></el-date-picker>
+                <div class="cav" id="chartLine" style="width:100%; height:400px;"></div>
+                <span class="date sec">
+                  <el-date-picker @change="change2" type="date" placeholder="选择日期" v-model="top3StoreDay" style="width: 100%;"></el-date-picker>
                 </span>
             </el-col>
             <el-col :span="12" class="box">
-                <div id="chartPie" style="width:100%; height:400px;"></div>
+                <div class="cav" id="chartPie" style="width:100%; height:400px;"></div>
                 <span class="date third">
-                  <el-date-picker @change="change3" type="date" placeholder="选择日期" v-model="select.top3StoreDay" style="width: 100%;"></el-date-picker>
+                  <el-date-picker @change="change3" type="date" placeholder="选择日期" v-model="top5StaffDay" style="width: 100%;"></el-date-picker>
                 </span>
             </el-col>
         </el-row>
@@ -44,11 +44,9 @@ export default {
       chartPieName:[],
       chartPieNum:[],
       chartPieData:[],
-      select:{
-        top6CommDay:'',
-        top5StaffDay:'',
-        top3StoreDay:''
-      }
+      top6CommDay:'',
+      top5StaffDay:'',
+      top3StoreDay:''
     };
   },
 
@@ -67,36 +65,48 @@ export default {
       return res;
     },
     change1(){
-      this.select.top6CommDay = new Date(this.select.top6CommDay).toLocaleDateString();
-      // console.log(new Date(this.select.top6CommDay).toLocaleDateString())
-      this.getData(this.select);
+      // console.log(this.top6CommDay)
+      this.top6CommDay = new Date(this.top6CommDay).toLocaleDateString();
+      // console.log(new Date(this.top6CommDay).toLocaleDateString())
+      this.getCol(this.top6CommDay);
     },
     change2(){
-      this.select.top5StaffDay = new Date(this.select.top5StaffDay).toLocaleDateString();
-      // console.log(new Date(this.select.top5StaffDay).toLocaleDateString())
-      this.getData(this.select);
+      this.top3StoreDay = new Date(this.top3StoreDay).toLocaleDateString();
+      console.log(new Date(this.top3StoreDay).toLocaleDateString())
+      this.getLine(this.top3StoreDay);
     },
     change3(){
-      this.select.top3StoreDay = new Date(this.select.top3StoreDay).toLocaleDateString();
-      // console.log(new Date(this.select.top3StoreDay).toLocaleDateString())
-      this.getData(this.select);
+      this.top5StaffDay = new Date(this.top5StaffDay).toLocaleDateString();
+      // console.log(new Date(this.top5StaffDay).toLocaleDateString())
+      this.getPie(this.top5StaffDay);
     },
-    getData(select) {
-      httpGet("/statist/getstatist",select)
+    getCol(select) {
+      httpGet("/statist/gettop6comm",{top6CommDay:select})
         .then(res => {
-          console.log(res);
+          console.log('col',res);
           if (res.code == 200) {
             // 今日统计销售前六名
             this.columnXData = [];
             this.columnYData = [];
-            for (let i = 0; i < res.data.top6Sell.length; i++) {
-              this.columnXData.push(res.data.top6Sell[i].title);
-              this.columnYData.push(res.data.top6Sell[i].count);
+            for (let i = 0; i < res.data.length; i++) {
+              this.columnXData.push(res.data[i].title);
+              this.columnYData.push(res.data[i].count);
             }
-            // console.log(this.columnXData);
-            // console.log(this.columnYData);
             this.drawColumnChart();
-
+          } else {
+            this.$massage({
+              message: res.msg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    getLine(select) {
+      httpGet("/statist/gettop3store",{top3StoreDay:select})
+        .then(res => {
+          console.log('3',res);
+          if (res.code == 200) {            
             // 店铺前三
             this.lineTime = [];
             this.lineStore = [];
@@ -104,18 +114,15 @@ export default {
             this.lineStoreData2 = [];
             this.lineStoreData3 = [];
             var num = 0;
-            for (let i in res.data.top3Store) {
+            for (let i in res.data) {
               num++;
-              // console.log(res.data.top3Store[i]);
-              this.lineStore.push(res.data.top3Store[i].storeName);
+              this.lineStore.push(res.data[i].storeName);
               var arr = [];
               var arr2 = [];
-              for (let n in res.data.top3Store[i].data) {
-                arr.push(res.data.top3Store[i].data[n]);
+              for (let n in res.data[i].data) {
+                arr.push(res.data[i].data[n]);
                 arr2.push(n.slice(5, 10));
               }
-              //   console.log(arr)
-              //   console.log(arr2)
               if (num == 1) {
                 this.lineStoreData1.push(arr);
                 this.lineTime.push(arr2);
@@ -125,28 +132,34 @@ export default {
                 this.lineStoreData3.push(arr);
               }
             }
-            // console.log(111,this.lineTime[0]);
-            // console.log(this.lineStoreData1[0]);
-            // console.log(this.lineStoreData2[0]);
-            // console.log(this.lineStoreData3[0]);
             this.drawLineChart();
+          } else {
+            this.$massage({
+              message: res.msg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    getPie(select) {
+      httpGet("/statist/gettop5staff",{top5StaffDay:select})
+        .then(res => {
+          console.log('5',res);
+          if (res.code == 200) {            
 
             this.chartPieName=[];
             this.chartPieNum=[];
             var arr3=[];
-            for(var i=0;i<res.data.top5Staff.length;i++){
-                var tmp = res.data.top5Staff[i];
+            for(var i=0;i<res.data.length;i++){
+                var tmp = res.data[i];
                 var acpter = tmp.accepter;
                 var cnt = tmp.count;
                 this.chartPieName.push(acpter)
                 this.chartPieNum.push(cnt)
                 arr3.push({name:acpter,value:cnt})
             }
-            // console.log(arr3);
             this.chartPieData = arr3;
-            // console.log(11,this.chartPieData)
-            // console.log(1,this.chartPieName)
-            // console.log(2,this.chartPieNum)
             this.drawPieChart();
           } else {
             this.$massage({
@@ -303,7 +316,9 @@ export default {
     }
   },
   created() {
-    this.getData(this.select);
+    this.getCol(this.top6CommDay);
+    this.getLine(this.top3StoreDay);
+    this.getPie(this.top5StaffDay);
   },
   mounted: function() {
   },
@@ -317,13 +332,22 @@ export default {
   width: 100%;
   float: left;
 }
+.cav{
+  margin-top: 20px;
+}
 .date{
   position: absolute;
-  top: 25px;
-  left: 180px;
+  /* top: 25px;
+  left: 180px; */
+  top: 10px;
+  left: 24px;
 }
 .third{
-  left: 325px;
+  /* left: 325px;
+      top: 61px; */
+}
+.sec{
+  /* left:600px; */
 }
 .box{
   position: relative;
