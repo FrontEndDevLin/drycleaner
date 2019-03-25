@@ -86,23 +86,22 @@ function Orderform() {
                 let progress = 0;
                 let rspData = { pno: pno, formCount: '', pCount: '', items: [] };
 
-                let select = param["select"] || "", kw = param["kw"] || "";
-                if (!select || !kw) {
-                    select = "";
-                    kw = "";
-                }
-                if (select) {
-                    let s = select;
-                    if (s != "user" && s != "phone" && s != "ordernum" && s != "price" && s != "color" && s != "acceptStore" && s != "accepter" && s != "cpler") {
-                        select = "";
+                let kw = param["kw"] || "";
+                let kwSQL = "";
+                if (kw) {
+                    kwArr = ["user", "phone", "ordernum", "price", "(SELECT color FROM clothes WHERE _id=cloth)", "acceptStore", "(SELECT name FROM member WHERE _id=accept)", "cpler"];
+                    for (let i = 0; i < kwArr.length; i++) {
+                        let t = kwArr[i];
+                        if (i == 0) {
+                            kwSQL += ` AND (${t} LIKE '%${kw}%'`;
+                        } else {
+                            kwSQL += ` OR ${t} LIKE '%${kw}%'`;
+                        }
                     }
+                    kwSQL += ")"
                 }
 
-                let sqlCnt = `SELECT count(_id) AS formCount FROM orderform WHERE del=?`;
-
-                if (select) {
-                    sqlCnt += ` AND ${select} LIKE '%${kw}%'`;
-                }
+                let sqlCnt = `SELECT count(_id) AS formCount FROM orderform WHERE del=?${kwSQL}`;
 
                 if (level != 99) {
                     sqlCnt += ` AND acceptStore=(SELECT store FROM member WHERE _id=${uid})`;
@@ -138,10 +137,7 @@ function Orderform() {
                     } break;
                 }
                 sort = sort == "1" ? "" : "DESC";
-                let sqlSel = `SELECT _id, ordernum, user, phone, (SELECT name FROM member WHERE _id=accept) AS accepter, (SELECT name FROM store WHERE _id=acceptStore) AS acceptStore, accepttime, (SELECT mark FROM clothes WHERE _id=cloth) AS mark, (SELECT color FROM clothes WHERE _id=cloth) AS color, price, complete, cpltime, (SELECT name FROM member WHERE _id=cpler) AS cpler FROM orderform WHERE del=?`;
-                if (select) {
-                    sqlSel += ` AND ${select} LIKE '%${kw}%'`;
-                }
+                let sqlSel = `SELECT _id, ordernum, user, phone, (SELECT name FROM member WHERE _id=accept) AS accepter, (SELECT name FROM store WHERE _id=acceptStore) AS acceptStore, accepttime, (SELECT mark FROM clothes WHERE _id=cloth) AS mark, (SELECT color FROM clothes WHERE _id=cloth) AS color, price, complete, cpltime, (SELECT name FROM member WHERE _id=cpler) AS cpler FROM orderform WHERE del=?${kwSQL}`;
                 if (level != 99) {
                     sqlSel += ` AND acceptStore=(SELECT store FROM member WHERE _id=${uid})`;
                 }
@@ -196,9 +192,12 @@ function Orderform() {
                 });
             } break;
             case 'delform': {
-                if (!NS.MethodFilter(req, res, "get")) return;
+                if (!NS.MethodFilter(req, res, "post")) return;
                 NS.GetPostData(req, (postParam) => {
                     let id = postParam["fid"];
+                    if (!id) {
+                        return NS.Send(res, NS.Build(400, "未知参数"));
+                    }
                     let sql = `UPDATE orderform SET del=0 WHERE _id=?`;
                     MySQL.Query(sql, [id], (err, result) => {
                         if (err) throw err;
