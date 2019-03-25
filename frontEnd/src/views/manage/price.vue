@@ -11,17 +11,17 @@
 
 		<!--列表-->
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-			<el-table-column type="id" min-width="10">
+			<el-table-column type="cid" min-width="10">
 			</el-table-column>
 			<el-table-column type="index" min-width="180">
 			</el-table-column>
-			<el-table-column prop="title" label="衣物名称" min-width="120">
+			<el-table-column prop="newTitle" label="衣物名称" min-width="120">
 			</el-table-column>
-			<el-table-column prop="price" label="价格" min-width="100">
+			<el-table-column prop="newPrice" label="价格" min-width="100">
 			</el-table-column>
 			<el-table-column label="操作" min-width="150">
 				<template slot-scope="scope">
-					<!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
+					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -33,15 +33,31 @@
 			</el-pagination>
 		</el-col>
 
+    <!--编辑界面-->
+		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+				<el-form-item label="衣物名称" prop="newTitle">
+					<el-input v-model="editForm.newTitle" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="价格" prop="newPrice">
+					<el-input-number v-model="editForm.newPrice" :min="10"></el-input-number>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="editFormVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+			</div>
+		</el-dialog>
+
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="衣物名称" prop="title">
-					<el-input v-model="addForm.title" auto-complete="off"></el-input>
+				<el-form-item label="衣物名称" prop="newTitle">
+					<el-input v-model="addForm.newTitle" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="价格">
-					<el-input-number v-model="addForm.price" :min="10"></el-input-number>
+				<el-form-item label="价格" prop="newPrice">
+					<el-input-number v-model="addForm.newPrice" :min="10"></el-input-number>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -73,27 +89,24 @@ export default {
       editFormVisible: false, //编辑界面是否显示
       editLoading: false,
       editFormRules: {
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }]
+        newTitle: [{ required: true, message: "请输入姓名", trigger: "blur" }]
       },
       //编辑界面数据
       editForm: {
-        id: 0,
-        name: "",
-        price: 0,
-        time: "",
-        dec: ""
+        cid: 0,
+        newTitle: "",
+        newPrice: 0
       },
 
       addFormVisible: false, //新增界面是否显示
       addLoading: false,
       addFormRules: {
-        title: [{ required: true, message: "请输入物品名称", trigger: "blur" }],
-        price: [{ required: true, message: "请输入单价", trigger: "blur" }]
+        newTitle: [{ required: true, message: "请输入物品名称", trigger: "blur" }]
       },
       //新增界面数据
       addForm: {
-        title: "",
-        price: 10// default 10
+        newTitle: "",
+        newPrice: 10// default 10
       }
     };
   },
@@ -120,9 +133,9 @@ export default {
             this.users = [];
             for (let i = 0; i < res.data.items.length; i++) {
               this.users.push({
-                id: res.data.items[i]._id,
-                price: res.data.items[i].price,
-                title: res.data.items[i].title
+                cid: res.data.items[i]._id,
+                newPrice: res.data.items[i].price,
+                newTitle: res.data.items[i].title
               });
             }
             console.log(this.users)
@@ -145,7 +158,7 @@ export default {
       })
         .then(res => {
           this.listLoading = true;
-          let para = { id: row.id };
+          let para = { cid: row.cid };
           console.log(para)
           httpPost("/cloth/delcommodit", para).then(res => {
             console.log("del", res);
@@ -187,7 +200,7 @@ export default {
             this.editLoading = true;
             let para = Object.assign({}, this.editForm);
             console.log(para);
-            httpPost("/staff/editstaff", para).then(res => {
+            httpPost("/cloth/editcommodit", para).then(res => {
               console.log("edit", res);
               this.editLoading = false;
               this.editFormVisible = false;
@@ -216,6 +229,7 @@ export default {
     },
     //新增
     addSubmit: function() {
+      console.log('price this.addForm',this.addForm)
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.$confirm("确认提交吗？", "提示", {}).then(() => {
@@ -223,7 +237,6 @@ export default {
             httpGet("/cloth/addcommodit", this.addForm)
               .then(res => {
                 console.log("price", res);
-                console.log('price this.addForm',this.addForm)
                 this.addFormVisible = false;
                 this.addLoading = false;
                 if (res.code == 200) {

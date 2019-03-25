@@ -211,7 +211,7 @@ export default {
             this.users = [];
             for (let i = 0; i < res.data.items.length; i++) {
               this.users.push({
-                accept: res.data.items[i].accept,
+                accept: res.data.items[i].accepter,
                 acceptStore: res.data.items[i].acceptStore,
                 accepttime: res.data.items[i].accepttime,
                 color: res.data.items[i].color,
