@@ -31,7 +31,7 @@
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="vid" width="10">
 			</el-table-column>
-			<el-table-column type="index" min-width="80">
+			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="newName" label="会员名称" min-width="120">
 			</el-table-column>

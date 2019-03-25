@@ -1,3 +1,13 @@
+#关于打包：
+npm run build
+``` bash
+# 执行该命令就可以打包，但是打包后，要把所打包文件 dist 里的 static 文件夹里的 fonts（dist/static/fonts）文件放进 css 文件夹里的 static （dist/static/css/static）文件夹（也就是说，fonts文件夹的最终路径是：（dist/static/css/static/fonts））
+
+```
+
+
+
+
 **demo**: [https://taylorchen709.github.io/vue-admin/](https://taylorchen709.github.io/vue-admin/)
 
 # To start
