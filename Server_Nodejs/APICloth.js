@@ -106,7 +106,7 @@ function Cloth() {
                     });
 
                     function doNext() {
-                        let sql = `UPDATE commodit SET title=? AND price=? WHERE _id=?`;
+                        let sql = `UPDATE commodit SET title=?, price=? WHERE _id=?`;
                         MySQL.Query(sql, [title, price, id], (err, result) => {
                             if (err) throw err;
                             if (result && result.affectedRows == 1) {
@@ -121,7 +121,10 @@ function Cloth() {
             case 'delcommodit': {
                 if (!NS.MethodFilter(req, res, "post")) return;
                 NS.GetPostData(req, (postParam) => {
-                    let id = postParam["id"];
+                    let id = postParam["cid"];
+                    if (!id) {
+                        return NS.Send(res, NS.Build(406, "参数错误"));
+                    }
                     let sql = `UPDATE commodit SET del=? WHERE _id=?`;
                     MySQL.Query(sql, [0, id], (err, result) => {
                         if (err) throw err;

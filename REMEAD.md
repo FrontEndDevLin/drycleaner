@@ -310,7 +310,6 @@
     param: {
         pno: [number] 默认1
         field: [string] 排序字段 默认为'accepttime',可选'acceptStore','price','complete','cpltime',
-        select: [string] 要搜索的字段，"user"||"phone"||"ordernum"||"price"||"color"||"acceptStore"||"accepter"||"cpler"
         kw: [string] 搜索的关键字 和select字段要同时出现
     }
 ```
