@@ -126,7 +126,6 @@ function Staff() {
                     }
                 })
 
-
                 let sql = `SELECT _id AS id, name, gender, phone, avatar, rgt, salary, (
                     SELECT name FROM store WHERE own=id
                 ) AS storename FROM member WHERE del=? AND level=? ORDER BY _id`;

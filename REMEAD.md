@@ -410,6 +410,17 @@
     }
 ```
 
+编辑价格表项目
+```
+    http://192.168.2.108:4449/cloth/editcommodit
+    method: post,
+    param: {
+        cid: number,
+        newTitle: string,
+        newPrice: string
+    }
+```
+
 
 ## 功能:
 ### ~~登录/注销~~
