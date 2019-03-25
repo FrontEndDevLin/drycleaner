@@ -86,7 +86,24 @@ function Orderform() {
                 let progress = 0;
                 let rspData = { pno: pno, formCount: '', pCount: '', items: [] };
 
+                let select = param["select"] || "", kw = param["kw"] || "";
+                if (!select || !kw) {
+                    select = "";
+                    kw = "";
+                }
+                if (select) {
+                    let s = select;
+                    if (s != "user" && s != "phone" && s != "ordernum" && s != "price" && s != "color" && s != "acceptStore" && s != "accepter" && s != "cpler") {
+                        select = "";
+                    }
+                }
+
                 let sqlCnt = `SELECT count(_id) AS formCount FROM orderform WHERE del=?`;
+
+                if (select) {
+                    sqlCnt += ` AND ${select} LIKE '%${kw}%'`;
+                }
+
                 if (level != 99) {
                     sqlCnt += ` AND acceptStore=(SELECT store FROM member WHERE _id=${uid})`;
                 }
@@ -121,9 +138,12 @@ function Orderform() {
                     } break;
                 }
                 sort = sort == "1" ? "" : "DESC";
-                let sqlSel = `SELECT _id, ordernum, user, phone, (SELECT name FROM member WHERE _id=accept) AS accept, (SELECT name FROM store WHERE _id=acceptStore) AS acceptStore, accepttime, (SELECT mark FROM clothes WHERE _id=cloth) AS mark, (SELECT color FROM clothes WHERE _id=cloth) AS color, price, complete, cpltime, (SELECT name FROM member WHERE _id=cpler) AS cpler FROM orderform WHERE del=?`;
+                let sqlSel = `SELECT _id, ordernum, user, phone, (SELECT name FROM member WHERE _id=accept) AS accepter, (SELECT name FROM store WHERE _id=acceptStore) AS acceptStore, accepttime, (SELECT mark FROM clothes WHERE _id=cloth) AS mark, (SELECT color FROM clothes WHERE _id=cloth) AS color, price, complete, cpltime, (SELECT name FROM member WHERE _id=cpler) AS cpler FROM orderform WHERE del=?`;
+                if (select) {
+                    sqlSel += ` AND ${select} LIKE '%${kw}%'`;
+                }
                 if (level != 99) {
-                    sqlCnt += ` AND acceptStore=(SELECT store FROM member WHERE _id=${uid})`;
+                    sqlSel += ` AND acceptStore=(SELECT store FROM member WHERE _id=${uid})`;
                 }
                 sqlSel += ` ORDER BY ${field} ${sort} LIMIT ?, ?`;
                 MySQL.Query(sqlSel, [1, (pno - 1) * pageSize, pageSize], (err, result) => {
@@ -174,8 +194,6 @@ function Orderform() {
                         NS.Send(res, NS.Build(400, "处理失败"));
                     }
                 });
-
-                
             } break;
             case 'delform': {
                 if (!NS.MethodFilter(req, res, "get")) return;

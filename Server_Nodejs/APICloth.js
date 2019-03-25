@@ -83,10 +83,40 @@ function Cloth() {
                         })
                     }
                 })
-                
             } break;
             case 'editcommodit': {
-                
+                if (!NS.MethodFilter(req, res, "post")) return;
+                NS.GetPostData(req, (postParam) => {
+                    let id = postParam["cid"], title = postParam["newTitle"] || "", price = postParam["newPrice"] || "";
+                    if (!id || !title || !price) {
+                        return NS.Send(res, NS.Build(403, "缺少参数"));
+                    }
+                    let sql = `SELECT _id FROM commodit WHERE title=?`;
+                    MySQL.Query(sql, [title], (err, result) => {
+                        if (err) throw err;
+                        if (result && result[0]) {
+                            if (result[0]._id != id) {
+                                NS.Send(res, NS.Build(406, "标题已存在"));
+                            } else {
+                                doNext();
+                            }
+                        } else {
+                            doNext();
+                        }
+                    });
+
+                    function doNext() {
+                        let sql = `UPDATE commodit SET title=? AND price=? WHERE _id=?`;
+                        MySQL.Query(sql, [title, price, id], (err, result) => {
+                            if (err) throw err;
+                            if (result && result.affectedRows == 1) {
+                                NS.Send(res, NS.Build(200, "修改成功"));
+                            } else {
+                                NS.Send(res, NS.Build(400, "修改失败"));
+                            }
+                        })
+                    }
+                })
             } break;
             case 'delcommodit': {
                 if (!NS.MethodFilter(req, res, "post")) return;

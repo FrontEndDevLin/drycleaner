@@ -309,7 +309,9 @@
     method: post,
     param: {
         pno: [number] 默认1
-        field: [string] 排序字段 默认为'accepttime',可选'acceptStore','price','complete','cpltime'
+        field: [string] 排序字段 默认为'accepttime',可选'acceptStore','price','complete','cpltime',
+        select: [string] 要搜索的字段，"user"||"phone"||"ordernum"||"price"||"color"||"acceptStore"||"accepter"||"cpler"
+        kw: [string] 搜索的关键字 和select字段要同时出现
     }
 ```
 
@@ -451,3 +453,10 @@
 
 ### ~~右上角通知~~
 1. ~~有新通知时, 右上角闪烁~~
+
+## TODO:
+1. 统计加入日期筛选
+2. ~~价格表可编辑~~
+3. ~~订单~~，员工加入搜索
+
+订单显示 accept -> accepter

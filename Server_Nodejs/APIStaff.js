@@ -447,8 +447,6 @@ function Staff() {
                     });
                 })
             } break;
-            default:
-                break;
         }
     }
 }
