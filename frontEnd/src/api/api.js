@@ -2,7 +2,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 // let base = '';//域名
-let base = 'http://192.168.2.108:4449';//域名test http://192.168.2.108:4449， http://127.0.0.1:4449， http://188.131.187.74:4449
+let base = 'http://127.0.0.1:4449';//域名test http://192.168.2.108:4449， http://127.0.0.1:4449， http://188.131.187.74:4449
 export const requestLogin = params => { return axios.get(`${base}/login`, params).then(res => res.data); };
 
 export const getUserList = params => { return axios.get(`${base}/user/list`, { params: params }); };
