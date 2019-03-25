@@ -255,8 +255,9 @@ export default {
       })
         .then(res => {
           this.listLoading = true;
-          let para = { id: row.id };
-          httpPost("/staff/delstaff", para).then(res => {
+          let para = { fid: row._id };
+          // console.log(row._id)
+          httpPost("/orderform/delform", para).then(res => {
             console.log("del", res);
             this.listLoading = false;
             if (res.code == 200) {
