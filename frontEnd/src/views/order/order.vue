@@ -4,6 +4,12 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
+					<el-input v-model="filters.name" placeholder="请输入搜索关键字"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" v-on:click="checkKw">查询</el-button>
+				</el-form-item>
+				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
 				</el-form-item>
         <el-form-item>
@@ -35,7 +41,7 @@
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="id" width="10">
 			</el-table-column>
-			<el-table-column type="index" min-width="60">
+			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="user" label="客户名字" min-width="100">
 			</el-table-column>
@@ -139,10 +145,7 @@ export default {
         { name: "完成时间", type: "cpltime" }
       ],
       sort: "", //降序，1升
-      sortArr: [
-        { name: "升序", type: '1' },
-        { name: "降序", type: '-1' }
-      ],
+      sortArr: [{ name: "升序", type: "1" }, { name: "降序", type: "-1" }],
       listLoading: false,
       sels: [], //列表选中列
 
@@ -181,11 +184,11 @@ export default {
   methods: {
     currentSel() {
       console.log(this.field);
-      this.getUsers(this.page, this.field, this.sort);
+      this.getUsers(this.page, this.field, this.sort, this.filters.name);
     },
     currentSort() {
       console.log(this.sort);
-      this.getUsers(this.page, this.field, this.sort);
+      this.getUsers(this.page, this.field, this.sort, this.filters.name);
     },
     //性别显示转换
     formatSex: function(row, column) {
@@ -193,14 +196,18 @@ export default {
     },
     handleCurrentChange(val) {
       this.page = val;
-      this.getUsers(this.page, this.field, this.sort);
+      this.getUsers(this.page, this.field, this.sort, this.filters.name);
+    },
+    checkKw(){
+      this.getUsers(this.page, this.field, this.sort, this.filters.name);
     },
     //获取用户列表
-    getUsers(page, field, sort) {
+    getUsers(page, field, sort, kw) {
       let param = {
         pno: page, // 当前页码 不传的话默认1
         field: field,
-        sort: sort
+        sort: sort,
+        kw: kw
       };
       httpGet("/orderform/getform", param)
         .then(res => {
@@ -209,6 +216,7 @@ export default {
             console.log("order list", res);
             this.total = res.data.formCount;
             this.users = [];
+            this.filters.name = "";
             for (let i = 0; i < res.data.items.length; i++) {
               this.users.push({
                 accept: res.data.items[i].accepter,
@@ -256,7 +264,12 @@ export default {
                 message: res.msg,
                 type: "success"
               });
-              this.getUsers(this.page, this.field, this.sort);
+              this.getUsers(
+                this.page,
+                this.field,
+                this.sort,
+                this.filters.name
+              );
             } else {
               this.$message({
                 message: res.msg,
@@ -321,7 +334,12 @@ export default {
                 message: res.msg,
                 type: "success"
               });
-              this.getUsers(this.page, this.field, this.sort);
+              this.getUsers(
+                this.page,
+                this.field,
+                this.sort,
+                this.filters.name
+              );
             } else {
               this.editLoading = false;
               this.$message({
@@ -354,7 +372,12 @@ export default {
                     type: "success"
                   });
                   this.$refs["addForm"].resetFields();
-                  this.getUsers(this.page, this.field, this.sort);
+                  this.getUsers(
+                    this.page,
+                    this.field,
+                    this.sort,
+                    this.filters.name
+                  );
                 } else {
                   this.$message({
                     message: res.msg,

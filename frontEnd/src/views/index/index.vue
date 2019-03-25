@@ -1,14 +1,23 @@
 <template>
     <section class="chart-container">
         <el-row>
-            <el-col :span="12">
+            <el-col :span="12" class="box">
                 <div id="chartColumn" style="width:100%; height:400px;"></div>
+                <span class="date">
+                  <el-date-picker @change="change1" type="date" placeholder="选择日期" v-model="select.top6CommDay" style="width: 100%;"></el-date-picker>
+                </span>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="12" class="box">
                 <div id="chartLine" style="width:100%; height:400px;"></div>
+                <span class="date">
+                  <el-date-picker @change="change2" type="date" placeholder="选择日期" v-model="select.top5StaffDay" style="width: 100%;"></el-date-picker>
+                </span>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="12" class="box">
                 <div id="chartPie" style="width:100%; height:400px;"></div>
+                <span class="date third">
+                  <el-date-picker @change="change3" type="date" placeholder="选择日期" v-model="select.top3StoreDay" style="width: 100%;"></el-date-picker>
+                </span>
             </el-col>
         </el-row>
     </section>
@@ -35,6 +44,11 @@ export default {
       chartPieName:[],
       chartPieNum:[],
       chartPieData:[],
+      select:{
+        top6CommDay:'',
+        top5StaffDay:'',
+        top3StoreDay:''
+      }
     };
   },
 
@@ -52,8 +66,23 @@ export default {
 
       return res;
     },
-    getData() {
-      httpGet("/statist/getstatist")
+    change1(){
+      this.select.top6CommDay = new Date(this.select.top6CommDay).toLocaleDateString();
+      // console.log(new Date(this.select.top6CommDay).toLocaleDateString())
+      this.getData(this.select);
+    },
+    change2(){
+      this.select.top5StaffDay = new Date(this.select.top5StaffDay).toLocaleDateString();
+      // console.log(new Date(this.select.top5StaffDay).toLocaleDateString())
+      this.getData(this.select);
+    },
+    change3(){
+      this.select.top3StoreDay = new Date(this.select.top3StoreDay).toLocaleDateString();
+      // console.log(new Date(this.select.top3StoreDay).toLocaleDateString())
+      this.getData(this.select);
+    },
+    getData(select) {
+      httpGet("/statist/getstatist",select)
         .then(res => {
           console.log(res);
           if (res.code == 200) {
@@ -131,7 +160,7 @@ export default {
     drawColumnChart() {
       this.chartColumn = echarts.init(document.getElementById("chartColumn"));
       this.chartColumn.setOption({
-        title: { text: "今日统计销售前六名" },
+        title: { text: "商品销售前六名" },
         tooltip: {},
         xAxis: {
           data: this.columnXData //["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
@@ -274,7 +303,7 @@ export default {
     }
   },
   created() {
-    this.getData();
+    this.getData(this.select);
   },
   mounted: function() {
   },
@@ -288,11 +317,17 @@ export default {
   width: 100%;
   float: left;
 }
-/*.chart div {
-        height: 400px;
-        float: left;
-    }*/
-
+.date{
+  position: absolute;
+  top: 25px;
+  left: 180px;
+}
+.third{
+  left: 325px;
+}
+.box{
+  position: relative;
+}
 .el-col {
   padding: 30px 20px;
 }

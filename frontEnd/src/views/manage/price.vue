@@ -13,7 +13,7 @@
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="cid" min-width="10">
 			</el-table-column>
-			<el-table-column type="index" min-width="180">
+			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="newTitle" label="衣物名称" min-width="120">
 			</el-table-column>
@@ -53,11 +53,11 @@
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="衣物名称" prop="newTitle">
-					<el-input v-model="addForm.newTitle" auto-complete="off"></el-input>
+				<el-form-item label="衣物名称" prop="title">
+					<el-input v-model="addForm.title" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="价格" prop="newPrice">
-					<el-input-number v-model="addForm.newPrice" :min="10"></el-input-number>
+				<el-form-item label="价格" prop="price">
+					<el-input-number v-model="addForm.price" :min="10"></el-input-number>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -101,12 +101,12 @@ export default {
       addFormVisible: false, //新增界面是否显示
       addLoading: false,
       addFormRules: {
-        newTitle: [{ required: true, message: "请输入物品名称", trigger: "blur" }]
+        title: [{ required: true, message: "请输入物品名称", trigger: "blur" }]
       },
       //新增界面数据
       addForm: {
-        newTitle: "",
-        newPrice: 10// default 10
+        title: "",
+        price: 10// default 10
       }
     };
   },
